@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
@@ -37,7 +36,7 @@ t = 0.5
 h = t/180
 
 # Small value tolerance (for testing stability, -1 disables it)
-tau = -1
+tolerance = -1
 
 # Plotting
 sample_rate = 10
@@ -292,7 +291,7 @@ def getMultipliedMat(n_final, coeffs, end, x, klist, p, q):
 # 3: Condition number
 
 
-def pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq):
+def pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq, tau):
     
     # Solves c for PDE matrix exponential method
     if problem == 2:
@@ -388,7 +387,6 @@ def pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq)
                     return np.max(np.linalg.cond(step))
                 except:
                     return
-            
 
         elif problem == 4: # Wave equation (WIP)
             if method == "t": # Trapezoidal
@@ -439,7 +437,7 @@ def pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq)
 
 
 def fftExt(n, end, L, gamma=oversample, samples=smp, xview=xview, fig=1, problem=0, coeff_eq=0, func_choice=0, plotvar=0, time=t, h=h, 
-           method="t", colour=False, tau=tau):
+           method="t", colour=False, tau=tolerance):
     
     # Initialise variables
     n_final, coeffs, odd = oversampleFunc(n, gamma)
@@ -472,7 +470,7 @@ def fftExt(n, end, L, gamma=oversample, samples=smp, xview=xview, fig=1, problem
         B[0] = np.ones(coeffs) * 0
         B[-1] = np.ones(coeffs) * 0
          
-        c = pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq)
+        c = pdeSolver(A, B, c, x, func_choice, problem, plotvar, time, method, coeff_eq, tau)
 
         # Various other tracked values get returned here
         if plotvar in [1,2,3]:
@@ -495,7 +493,7 @@ def fftExt(n, end, L, gamma=oversample, samples=smp, xview=xview, fig=1, problem
 #----------------------------------------------------------
 
 def compareParameters(n_lower, n_upper, interval, gvals, Tvals, L, samples=smp, xview=xview, problem=0, func_choice=0, plotvar=0, coeff_eq=True,
-                      time=t, h=h, method="t", tau=tau, Tseparate=True,  newplot=True, cols=False):
+                      time=t, h=h, method="t", tau=tolerance, Tseparate=True,  newplot=True, cols=False):
     
     # plotvar:
     # 0: Error plot
@@ -782,6 +780,7 @@ def compareParameters(n_lower, n_upper, interval, gvals, Tvals, L, samples=smp, 
 #gvals = [1, 2, 3, 4]
 #Tvals = [1.1]
 
+#compareParameters(n_lower, n_upper, interval, gvals, Tvals, L, problem=2, samples=smp, func_choice=0, time=0.5, tau=-1)
 #compareParameters(n_lower, n_upper, interval, gvals, Tvals, L, problem=2, samples=smp, func_choice=0, time=0.5, tau=-1, method="p")
 
 
@@ -1066,5 +1065,3 @@ def compareParameters(n_lower, n_upper, interval, gvals, Tvals, L, samples=smp, 
 #plt.figure()
 #plt.xlim(-xplot, xplot)
 #fftExt(n_init, T, L, oversample, problem=4, func_choice=2, method="m", fig=2)
-
-
